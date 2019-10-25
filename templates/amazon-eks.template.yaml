@@ -127,10 +127,6 @@ Parameters:
     Type: "AWS::EC2::VPC::Id"
   PublicSubnet1ID:
     Type: "AWS::EC2::Subnet::Id"
-  PublicSubnet2ID:
-    Type: "AWS::EC2::Subnet::Id"
-  PublicSubnet3ID:
-    Type: "AWS::EC2::Subnet::Id"
   PrivateSubnet1ID:
     Type: "AWS::EC2::Subnet::Id"
   PrivateSubnet2ID:
@@ -158,7 +154,7 @@ Parameters:
   ProvisionBastionHost:
     Type: String
     AllowedValues: [ "Enabled", "Disabled" ]
-    Default: "Enabled"
+    Default: "Disabled"
   BastionBootstrapScript:
     Default: ""
     Type: String
@@ -232,7 +228,6 @@ Resources:
       Parameters:
         VPCID: !Ref VPCID
         PublicSubnet1ID: !Ref PublicSubnet1ID
-        PublicSubnet2ID: !Ref PublicSubnet2ID
         KeyPairName: !Ref KeyPairName
         QSS3BucketName: !Ref QSS3BucketName
         QSS3KeyPrefix: !Sub '${QSS3KeyPrefix}submodules/quickstart-linux-bastion/'
@@ -279,7 +274,6 @@ Resources:
         BootstrapArguments: !Ref BootstrapArguments
         QSS3BucketName: !Ref QSS3BucketName
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
-        CleanupSecurityGroupDependenciesLambdaArn: !GetAtt FunctionStack.Outputs.CleanupSecurityGroupDependenciesLambdaArn
   BastionSShToNodes:
     Condition: EnableBastion
     Type: "AWS::EC2::SecurityGroupIngress"
@@ -385,7 +379,7 @@ Resources:
       ParentStackId: !Ref AWS::StackId
       CfnParameters:
         SecurityGroupIds: !Ref ControlPlaneSecurityGroup
-        SubnetIds: !Join [",", [ !Ref PrivateSubnet1ID, !Ref PrivateSubnet2ID, !Ref PrivateSubnet3ID, !Ref PublicSubnet1ID, !Ref PublicSubnet2ID, !Ref PublicSubnet3ID ]]
+        SubnetIds: !Join [",", [ !Ref PrivateSubnet1ID, !Ref PrivateSubnet2ID, !Ref PrivateSubnet3ID, !Ref PublicSubnet1ID ]]
         RoleArn: !GetAtt IamStack.Outputs.ControlPlaneRoleArn
         NodeInstanceRoleArn: !GetAtt IamStack.Outputs.NodeInstanceRoleArn
         KubeManifestLambdaArn: !GetAtt FunctionStack.Outputs.KubeManifestLambdaArn
